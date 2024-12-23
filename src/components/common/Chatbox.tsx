@@ -33,6 +33,7 @@ const ChatBox = () => {
 		const newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL, {
 			reconnectionDelayMax: 3000,
 			reconnectionAttempts: 10,
+			transports: ['websocket', 'polling'],
 		});
 
 		setSocket(newSocket);
