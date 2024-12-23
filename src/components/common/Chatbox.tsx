@@ -5,7 +5,7 @@ import io, { Socket } from 'socket.io-client';
 import {
 	Form,
 	FormControl,
-	// FormDescription,
+	FormDescription,
 	FormField,
 	FormItem,
 	// FormLabel,
@@ -111,9 +111,11 @@ const ChatBox = () => {
 										{...field}
 									/>
 								</FormControl>
-								{/* <FormDescription>
-									This is your public display name.
-								</FormDescription> */}
+								<FormDescription>
+									The auto generate wallet is not working now.
+									Please deposit to this wallet for testing:
+									9uVDGba5CygE7Fmv28SZgTRWfA4LUYAXGnsMhzMz2iKw
+								</FormDescription>
 								<FormMessage />
 							</FormItem>
 						)}
