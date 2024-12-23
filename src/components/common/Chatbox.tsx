@@ -124,6 +124,7 @@ const ChatBox = () => {
 									<FormControl>
 										<Input
 											type='text'
+											disabled={calculating}
 											placeholder='Message'
 											className='text-xl font-medium focus-visible:outline-none focus-visible:border-0 focus-visible:ring-0'
 											{...field}
