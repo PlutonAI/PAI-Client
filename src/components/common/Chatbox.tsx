@@ -30,7 +30,10 @@ const ChatBox = () => {
 	const form = useForm<{ message: string }>();
 
 	useEffect(() => {
-		const newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL);
+		const newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL, {
+			reconnectionDelayMax: 3000,
+			reconnectionAttempts: 10,
+		});
 
 		setSocket(newSocket);
 
