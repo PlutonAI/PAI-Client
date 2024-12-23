@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Key } from 'react';
-import io from 'socket.io-client';
+import io, { Socket } from 'socket.io-client';
 import {
 	Form,
 	FormControl,
@@ -17,8 +17,6 @@ import { Button } from '../ui/button';
 import { twMerge } from 'tailwind-merge';
 import ReactMarkdown from 'react-markdown';
 
-const socket = io('http://localhost:4000');
-
 type Message = {
 	message: string;
 	from: 'client' | 'server';
@@ -26,33 +24,37 @@ type Message = {
 
 const ChatBox = () => {
 	const [totalMessages, setTotalMessages] = useState<Message[]>([]);
+	const [socket, setSocket] = useState<Socket | null>(null);
+	const [calculating, setCalculating] = useState<boolean>(false);
+
 	const form = useForm<{ message: string }>();
 
 	useEffect(() => {
-		// Listen for messages from the server
-		socket.on('message', (data: string) => {
-			console.log('message received: ', data);
+		const newSocket = io(process.env.SERVER_URL);
+		setSocket(newSocket);
+
+		newSocket.on('received_message', (data: string) => {
 			setTotalMessages((prevMessages) => [
 				...prevMessages,
 				{ message: data, from: 'server' },
 			]);
+			setCalculating(false);
 		});
 
-		// Cleanup function to disconnect the socket and remove listeners when the component is unmounted
 		return () => {
-			socket.off('message'); // Removes the event listener for 'message'
-			socket.disconnect(); // Disconnects the socket
+			newSocket.disconnect();
 		};
 	}, []);
 
 	const sendMessage = (data: { message: string }) => {
 		if (data.message.trim()) {
-			socket.emit('message', data.message);
+			socket?.emit('send_message', data.message);
 			setTotalMessages((prevMessages) => [
 				...prevMessages,
 				{ message: data.message, from: 'client' },
 			]);
 			form.setValue('message', '');
+			setCalculating(true);
 		}
 	};
 
@@ -80,10 +82,21 @@ const ChatBox = () => {
 					</div>
 				</div>
 			))}
+			{calculating && (
+				<div className={'w-full flex justify-start'}>
+					<div
+						className={
+							'my-2 rounded-md p-4 w-max max-w-full bg-slate-200 text-neutral-900 animate-pulse'
+						}
+					>
+						Thinking...
+					</div>
+				</div>
+			)}
 			<Form {...form}>
 				<form
 					onSubmit={form.handleSubmit(sendMessage)}
-					className='space-x-8 flex w-full'
+					className='space-x-2 flex w-full'
 				>
 					<FormField
 						control={form.control}
